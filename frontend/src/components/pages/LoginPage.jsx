@@ -3,6 +3,7 @@ import CapstoneInput from "../common/CapstoneInput";
 import EmailIcon from "../../utils/icons/EmailIcon";
 import PasswordIcon from "../../utils/icons/PasswordIcon";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 function LoginPage() {
   const navigate = useNavigate();
@@ -25,7 +26,26 @@ function LoginPage() {
   };
   const validateLoginForm = () => {
     // Implement Login Form Validation
-    return true;
+    let valid = true;
+    if (!emailRef.current.value.trim()) {
+      toast.error("Email Cannot Be Empty");
+      setEmailError(true);
+      valid = false;
+    } else if (!/\S+@\S+\.\S+/.test(emailRef.current.value)) {
+      toast.error("Entered Email is Invalid");
+      setEmailError(true);
+      valid = false;
+    } else {
+      setEmailError(false);
+    }
+    if (!passwordRef.current.value.trim()) {
+      setPasswordError(true);
+      toast.error("Password Cannot Be Empty");
+      valid = false;
+    } else {
+      setPasswordError(false);
+    }
+    return valid;
   };
   return (
     <div className="flex h-3/4 w-full justify-center items-center">
@@ -37,7 +57,7 @@ function LoginPage() {
               placeholder="Email"
               icon={<EmailIcon />}
               type="email"
-              ref={emailRef}
+              parentRef={emailRef}
               error={emailError}
             />
           </div>
@@ -46,7 +66,7 @@ function LoginPage() {
               placeholder="Password"
               icon={<PasswordIcon />}
               type="password"
-              ref={passwordRef}
+              parentRef={passwordRef}
               error={passwordError}
             />
           </div>
