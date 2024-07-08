@@ -2,37 +2,45 @@ import React, { useRef, useState } from "react";
 import CapstoneInput from "../common/CapstoneInput";
 import EmailIcon from "../../utils/icons/EmailIcon";
 import PasswordIcon from "../../utils/icons/PasswordIcon";
-import { useNavigate } from "react-router-dom";
+import ProfileIcon from "../../utils/icons/ProfileIcon";
 
-function LoginPage() {
-  const navigate = useNavigate();
+function SignUpPage() {
+  const nameRef = useRef();
   const emailRef = useRef();
   const passwordRef = useRef();
+  const repeatPasswordRef = useRef();
+  const [nameError, setNameError] = useState(false);
   const [emailError, setEmailError] = useState(false);
-  const [passwordError, setPasswordError] = useState(false);
-  const handleLoginClick = (e) => {
-    e.preventDefault();
-    if (!validateLoginForm()) return;
-    resetFormError();
+  const [passwordMatchedError, setPasswordMatchedError] = useState(false);
+  const resetFormError = () => {
+    setNameError(false);
+    setEmailError(false);
+    setPasswordMatchedError(false);
+  };
+  const validateSignupForm = () => {
+    // Implement Form Validation
+    return true;
   };
   const handleSignUpClick = (e) => {
     e.preventDefault();
-    navigate("/signUp");
-  };
-  const resetFormError = () => {
-    setEmailError(false);
-    setPasswordError(false);
-  };
-  const validateLoginForm = () => {
-    // Implement Login Form Validation
-    return true;
+    if (!validateSignupForm()) return;
+    resetFormError();
   };
   return (
     <div className="flex h-3/4 w-full justify-center items-center">
       <div className="border-solid border-2 border-gray-700 rounded-xl p-8 w-1/4">
-        <h1 className="text-center text-xl">Login</h1>
+        <h1 className="text-center text-xl">Sign Up</h1>
         <div>
           <div className="pt-6 px-4">
+            <CapstoneInput
+              placeholder="Name"
+              icon={<ProfileIcon />}
+              type="text"
+              ref={nameRef}
+              error={nameError}
+            />
+          </div>
+          <div className="pt-3 px-4">
             <CapstoneInput
               placeholder="Email"
               icon={<EmailIcon />}
@@ -47,19 +55,19 @@ function LoginPage() {
               icon={<PasswordIcon />}
               type="password"
               ref={passwordRef}
-              error={passwordError}
+              error={passwordMatchedError}
             />
           </div>
           <div className="pt-3 px-4">
-            <button
-              className="btn btn-neutral w-full"
-              onClick={handleLoginClick}
-            >
-              Login
-            </button>
+            <CapstoneInput
+              placeholder="Repeat Password"
+              icon={<PasswordIcon />}
+              type="password"
+              ref={repeatPasswordRef}
+              error={passwordMatchedError}
+            />
           </div>
-          <hr class="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700" />
-          <div className="px-4">
+          <div className="pt-6 px-4">
             <button
               className="btn btn-primary w-full"
               onClick={handleSignUpClick}
@@ -73,4 +81,4 @@ function LoginPage() {
   );
 }
 
-export default LoginPage;
+export default SignUpPage;
