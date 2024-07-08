@@ -5,11 +5,13 @@ import {
   Navigate,
 } from "react-router-dom";
 import LoginPage from "./components/pages/LoginPage";
+import SignUpPage from "./components/pages/SignUpPage";
 
 function App() {
   return (
     <Router>
       <Routes>
+        <Route Component={SignUpPage} path="/signUp" />
         <Route Component={LoginPage} path="/login" />
         <Route path="*" Component={() => <Navigate to="/login" replace />} />
       </Routes>
