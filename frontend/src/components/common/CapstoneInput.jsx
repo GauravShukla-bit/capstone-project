@@ -1,6 +1,6 @@
 import React from "react";
 
-function CapstoneInput({ placeholder, type, icon, ref, error }) {
+function CapstoneInput({ placeholder, type, icon, parentRef, error }) {
   return (
     <React.Fragment>
       <label
@@ -15,7 +15,7 @@ function CapstoneInput({ placeholder, type, icon, ref, error }) {
           className="grow"
           placeholder={placeholder}
           autocomplete="none"
-          ref={ref}
+          ref={parentRef}
         />
       </label>
     </React.Fragment>

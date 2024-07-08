@@ -3,6 +3,11 @@ import CapstoneInput from "../common/CapstoneInput";
 import EmailIcon from "../../utils/icons/EmailIcon";
 import PasswordIcon from "../../utils/icons/PasswordIcon";
 import ProfileIcon from "../../utils/icons/ProfileIcon";
+import { toast } from "react-toastify";
+import {
+  MAX_PASSWORD_LENGTH,
+  MIN_PASSWORD_LENGTH,
+} from "../../utils/Constants";
 
 function SignUpPage() {
   const nameRef = useRef();
@@ -11,15 +16,54 @@ function SignUpPage() {
   const repeatPasswordRef = useRef();
   const [nameError, setNameError] = useState(false);
   const [emailError, setEmailError] = useState(false);
+  const [passwordError, setPasswordError] = useState(false);
   const [passwordMatchedError, setPasswordMatchedError] = useState(false);
   const resetFormError = () => {
     setNameError(false);
     setEmailError(false);
     setPasswordMatchedError(false);
+    setPasswordError(false);
   };
   const validateSignupForm = () => {
     // Implement Form Validation
-    return true;
+    let valid = true;
+    if (!nameRef.current.value.trim()) {
+      toast.error("Name Cannot Be Empty");
+      setNameError(true);
+      valid = false;
+    } else {
+      setNameError(false);
+    }
+    if (!emailRef.current.value.trim()) {
+      toast.error("Email Cannot Be Empty");
+      setEmailError(true);
+      valid = false;
+    } else if (!/\S+@\S+\.\S+/.test(emailRef.current.value)) {
+      toast.error("Entered Email is Invalid");
+      setEmailError(true);
+      valid = false;
+    } else {
+      setEmailError(false);
+    }
+    if (passwordRef.current.value.length < MIN_PASSWORD_LENGTH) {
+      toast.error(`Minimum Password Length is ${MIN_PASSWORD_LENGTH}`);
+      setPasswordError(true);
+      valid = false;
+    } else if (passwordRef.current.value.length > MAX_PASSWORD_LENGTH) {
+      toast.error(`Maximum Password Length is ${MAX_PASSWORD_LENGTH}`);
+      setPasswordError(true);
+      valid = false;
+    } else {
+      setPasswordError(false);
+    }
+    if (passwordRef.current.value !== repeatPasswordRef.current.value) {
+      toast.error("Passwords Does't match");
+      setPasswordMatchedError(true);
+      valid = false;
+    } else {
+      setPasswordMatchedError(false);
+    }
+    return valid;
   };
   const handleSignUpClick = (e) => {
     e.preventDefault();
@@ -36,7 +80,7 @@ function SignUpPage() {
               placeholder="Name"
               icon={<ProfileIcon />}
               type="text"
-              ref={nameRef}
+              parentRef={nameRef}
               error={nameError}
             />
           </div>
@@ -45,7 +89,7 @@ function SignUpPage() {
               placeholder="Email"
               icon={<EmailIcon />}
               type="email"
-              ref={emailRef}
+              parentRef={emailRef}
               error={emailError}
             />
           </div>
@@ -54,8 +98,8 @@ function SignUpPage() {
               placeholder="Password"
               icon={<PasswordIcon />}
               type="password"
-              ref={passwordRef}
-              error={passwordMatchedError}
+              parentRef={passwordRef}
+              error={passwordMatchedError || passwordError}
             />
           </div>
           <div className="pt-3 px-4">
@@ -63,7 +107,7 @@ function SignUpPage() {
               placeholder="Repeat Password"
               icon={<PasswordIcon />}
               type="password"
-              ref={repeatPasswordRef}
+              parentRef={repeatPasswordRef}
               error={passwordMatchedError}
             />
           </div>
