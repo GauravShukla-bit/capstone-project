@@ -34,9 +34,11 @@ public class AuthService {
     @Value("${jwt.cookie.name}")
     private String COOKIE_NAME;
 
-    public void login(LoginRequestDTO loginRequestDTO) {
-        System.out.println(loginRequestDTO);
-        System.out.println(userDAO.getAllUsers());
+    public ResponseEntity<String> login(LoginRequestDTO loginRequestDTO) {
+        User user = userDAO.getUserByEmail(loginRequestDTO.getEmail());
+        if (user == null ||!Hashing.sha256().hashString(loginRequestDTO.getPassword(), StandardCharsets.UTF_8).equals(user.getHashedPassword()))
+            return ResponseEntity.badRequest().body("Invalid Email/Password");
+        return getResponseWithCookie(user);
     }
 
     public ResponseEntity<String> signUp(SignUpRequestDTO signUpRequestDTO) {

@@ -25,4 +25,10 @@ public class UserDAO extends AbstractDAO {
         typedQuery.setParameter("userId", userId);
         return typedQuery.getSingleResult();
     }
+
+    public User getUserByEmail(String email){
+        TypedQuery<User> typedQuery = entityManager.createNamedQuery("User.getUserByEmail", User.class);
+        typedQuery.setParameter("email", email);
+        return typedQuery.getSingleResult();
+    }
 }
