@@ -38,7 +38,7 @@ public class AuthService {
 
     public ResponseEntity<String> login(LoginRequestDTO loginRequestDTO) {
         User user = userDAO.getUserByEmail(loginRequestDTO.getEmail());
-        if (user == null || !Hashing.sha256().hashString(loginRequestDTO.getPassword(), StandardCharsets.UTF_8).equals(user.getHashedPassword()))
+        if (user == null || !Hashing.sha256().hashString(loginRequestDTO.getPassword(), StandardCharsets.UTF_8).toString().equals(user.getHashedPassword()))
             return ResponseEntity.badRequest().body("Invalid Email/Password");
         ObjectMapper objectMapper = new ObjectMapper();
         try {
@@ -54,7 +54,6 @@ public class AuthService {
         if (duplicateCount > 0L) {
             new ResponseEntity<>(getErrorBody("User Already Exists"), HttpStatus.BAD_REQUEST);
         }
-        ;
         User user = new User();
         user.setEmail(signUpRequestDTO.getEmail());
         user.setName(signUpRequestDTO.getName());
