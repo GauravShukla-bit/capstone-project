@@ -49,7 +49,6 @@ public class AuthService {
     }
 
     public ResponseEntity<UserDTO> signUp(SignUpRequestDTO signUpRequestDTO) {
-        System.out.println(signUpRequestDTO);
         Long duplicateCount = userDAO.getDuplicateUserCount(signUpRequestDTO.getEmail());
         if (duplicateCount > 0L) {
             new ResponseEntity<>(getErrorBody("User Already Exists"), HttpStatus.BAD_REQUEST);
@@ -65,8 +64,13 @@ public class AuthService {
     public ResponseEntity<UserDTO> authenticate(HttpServletRequest httpServletRequest) {
         String value = null;
         Long id = null;
-        for (Cookie c : httpServletRequest.getCookies()) {
-            if (c.getName().equals(COOKIE_NAME)) value = c.getValue();
+        Cookie[] cookies  = httpServletRequest.getCookies();
+        if(cookies != null){
+            for (Cookie c : httpServletRequest.getCookies()) {
+                if (c.getName().equals(COOKIE_NAME)) value = c.getValue();
+            }
+        } else {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
         if (value != null) {
             try {
@@ -78,7 +82,7 @@ public class AuthService {
             }
         }
         if (id != null) {
-            return getResponseWithCookie(userDAO.getUserById(id));
+            return ResponseEntity.ok(getUserDTOFromUser(userDAO.getUserById(id)));
         }
         return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
@@ -91,10 +95,15 @@ public class AuthService {
 
     private ResponseEntity<UserDTO> getResponseWithCookie(User user) {
         JwtBuilder jwtBuilder = Jwts.builder().setId(user.getUserId().toString()).setIssuedAt(new Date(System.currentTimeMillis())).setExpiration(new Date(System.currentTimeMillis() + 1000000000)).setIssuer("capstone-project").setSubject("auth").signWith(SignatureAlgorithm.HS256, JWT_SECRET);
+        UserDTO userDTO = getUserDTOFromUser(user);
+        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, COOKIE_NAME + "=" + jwtBuilder.compact()).body(userDTO);
+    }
+
+    private UserDTO getUserDTOFromUser(User user){
         UserDTO userDTO = new UserDTO();
         userDTO.setUserId(user.getUserId());
         userDTO.setName(user.getName());
         userDTO.setEmail(user.getEmail());
-        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, COOKIE_NAME + "=" + jwtBuilder.compact()).body(userDTO);
+        return userDTO;
     }
 }
