@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useContext } from "react";
 import CapstoneInput from "../common/CapstoneInput";
 import EmailIcon from "../../utils/icons/EmailIcon";
 import PasswordIcon from "../../utils/icons/PasswordIcon";
@@ -8,8 +8,13 @@ import {
   MAX_PASSWORD_LENGTH,
   MIN_PASSWORD_LENGTH,
 } from "../../utils/Constants";
+import AuthService from "../../service/AuthService";
+import AuthContext from "../../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 function SignUpPage() {
+  const authContext = useContext(AuthContext);
+  const navigate = useNavigate();
   const nameRef = useRef();
   const emailRef = useRef();
   const passwordRef = useRef();
@@ -69,6 +74,20 @@ function SignUpPage() {
     e.preventDefault();
     if (!validateSignupForm()) return;
     resetFormError();
+    AuthService.postUserSignUp(
+      {
+        name: nameRef.current.value,
+        email: emailRef.current.value,
+        password: passwordRef.current.value,
+      },
+      (data) => {
+        authContext.setUser(data);
+        navigate("/home");
+      },
+      (err) => {
+        console.error(err);
+      }
+    );
   };
   return (
     <div className="flex h-3/4 w-full justify-center items-center">
