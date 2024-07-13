@@ -1,20 +1,39 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useContext, useEffect } from "react";
 import CapstoneInput from "../common/CapstoneInput";
 import EmailIcon from "../../utils/icons/EmailIcon";
 import PasswordIcon from "../../utils/icons/PasswordIcon";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import AuthService from "../../service/AuthService";
+import AuthContext from "../../context/AuthContext";
 
 function LoginPage() {
+  const authContext = useContext(AuthContext);
   const navigate = useNavigate();
   const emailRef = useRef();
   const passwordRef = useRef();
   const [emailError, setEmailError] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(null);
   const handleLoginClick = (e) => {
     e.preventDefault();
     if (!validateLoginForm()) return;
     resetFormError();
+    AuthService.postUserLogin(
+      {
+        email: emailRef.current.value,
+        password: passwordRef.current.value,
+      },
+      (data) => {
+        authContext.setUser(data);
+        setErrorMessage(null);
+        navigate("/home");
+      },
+      (err) => {
+        setErrorMessage(err.data);
+        console.error(err);
+      }
+    );
   };
   const handleSignUpClick = (e) => {
     e.preventDefault();
@@ -47,10 +66,22 @@ function LoginPage() {
     }
     return valid;
   };
+  useEffect(() => {
+    if (authContext.user) {
+      navigate("/home");
+    }
+  }, [authContext]);
   return (
     <div className="flex h-3/4 w-full justify-center items-center">
       <div className="border-solid border-2 border-gray-700 rounded-xl p-8 w-1/4">
         <h1 className="text-center text-xl">Login</h1>
+        {errorMessage && (
+          <div className="mt-5 mx-4">
+            <div className="bg-red-500 text-white text-center rounded-lg py-2">
+              {errorMessage}
+            </div>
+          </div>
+        )}
         <div>
           <div className="pt-6 px-4">
             <CapstoneInput
